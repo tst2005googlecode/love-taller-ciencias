@@ -10,13 +10,38 @@ function love.load()
     skinPlane = { skin75, skin90, skin135}
     plane1 = { x = 500, y = 500, rot = 90, skin = skinPlane}
 
-    --Variables globales
+    --global variables
     delta_rot = 1.8
 
     width = skin90:getWidth()
     height = skin90:getHeight()
 
     activeRays = {}
+
+    --collisions 
+    world = love.physics.newWorld(0, 0, true)
+
+    solidPlane1 = {}
+    solidPlane1.b = love.physics.newBody(world, plane1.x, plane1.y, "dynamic")  -- set x,y position (400,200) and let it move and hit other objects ("dynamic")
+    solidPlane1.b:setMass(0)                                        -- make it pretty light
+    solidPlane1.s = love.physics.newCircleShape(50)                  -- give it a radius of 50
+    solidPlane1.f = love.physics.newFixture(solidPlane1.b, solidPlane1.s)          -- connect body to shape
+    solidPlane1.f:setRestitution(0.4)                                -- make it bouncy
+    solidPlane1.f:setUserData("solidPlane1")                         -- give it a name, which we'll access later
+
+    solidPlane2 = {}
+    solidPlane2.b = love.physics.newBody(world, 500, 200, "dynamic")  -- set x,y position (400,200) and let it move and hit other objects ("dynamic")
+    solidPlane2.b:setMass(0)                                        -- make it pretty light
+    solidPlane2.s = love.physics.newCircleShape(50)                  -- give it a radius of 50
+    solidPlane2.f = love.physics.newFixture(solidPlane2.b, solidPlane2.s)          -- connect body to shape
+    solidPlane2.f:setRestitution(0.4)                                -- make it bouncy
+    solidPlane2.f:setUserData("solidPlane2")                         -- give it a name, which we'll access later
+
+
+
+    world:setCallbacks(beginContact, endContact, preSolve, postSolve)
+
+    contact = 0
 end
 
 function love.draw()
@@ -45,10 +70,15 @@ function love.draw()
     end
 
     table.foreach(activeRays, drawRay)
+
+    love.graphics.print(contact, 10, 50)
+
     love.graphics.reset()
+
+    love.graphics.circle("line", solidPlane2.b:getX(),solidPlane2.b:getY(), solidPlane2.s:getRadius(), 20)
 end
 
-function love.update()
+function love.update(dt)
 
     actualSkin = plane1.skin[2]
     
@@ -87,4 +117,25 @@ function love.update()
     end
 
     table.foreach(activeRays, updateRay)
+
+    --collision
+    solidPlane1.b:setX(plane1.x) 
+    solidPlane1.b:setY(plane1.y)  
+    world:update(dt)
+end
+
+function beginContact(a, b, coll)
+    contact = contact + 1
+end
+
+function endContact(a, b, coll)
+    
+end
+
+function preSolve(a, b, coll)
+    
+end
+
+function postSolve(a, b, coll)
+    
 end
