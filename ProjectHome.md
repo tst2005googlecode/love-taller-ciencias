@@ -1,0 +1,1 @@
+En este repo se encuentra todas clases y los materiales relacionados a LÖVE para el armado de los talleres de ciencia
